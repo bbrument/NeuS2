@@ -103,6 +103,34 @@ int main(int argc, char** argv) {
 		{'v', "version"},
 	};
 
+	Flag save_mesh_flag{
+		parser,
+		"SAVE_MESH",
+		"Save the mesh at the end of the training.",
+		{"save-mesh"},
+	};
+
+	Flag save_snapshot_flag{
+		parser,
+		"SAVE_SNAPSHOT",
+		"Save the snapshot at the end of the training.",
+		{"save-snapshot"},
+	};
+
+	ValueFlag<uint32_t> max_iter_flag{
+		parser,
+		"MAXITER",
+		"Maximum number of iterations.",
+		{"maxiter"},
+    };
+
+	ValueFlag<uint32_t> resolution_flag{
+		parser,
+		"RESOLUTION",
+		"Resolution of the mesh.",
+		{"resolution"},
+	};
+
 	// Parse command line arguments and react to parsing
 	// errors using exceptions.
 	try {
@@ -165,6 +193,12 @@ int main(int argc, char** argv) {
 		}
 
 		Testbed testbed{mode};
+
+		if (max_iter_flag){
+			testbed.set_max_iter(get(max_iter_flag));
+		}
+
+		tlog::info() << "Number of iterations : " << testbed.get_max_iter();
 
 		if (scene_flag) {
 			fs::path scene_path = get(scene_flag);
@@ -233,8 +267,38 @@ int main(int argc, char** argv) {
 				// tlog::info() << "iteration=" << testbed.m_training_step << " loss=" << testbed.m_loss_scalar.val() << " lr=" << testbed.m_optimizer.learning_rate();
 			}
 		}
+
+		// Save snapshot
+		std::string path = get(scene_flag);
+		size_t found = path.find_last_of("/\\");
+		std::string folder_name = path.substr(0,found);
+		std::string  snapshot_filename = folder_name +"/snapshot_"+to_string(testbed.get_max_iter())+".msgpack";
+		if(save_snapshot_flag){
+			tlog::info() << "Saving Snapshot !";
+			tlog::info() << snapshot_filename;
+			testbed.save_snapshot(snapshot_filename,false);
+		}
+
+		// Save mesh
+		static char obj_filename_buf[128] = "";
+		if (obj_filename_buf[0] == '\0') {
+			snprintf(obj_filename_buf, sizeof(obj_filename_buf), "%s", (folder_name+"/mesh_"+to_string(testbed.get_max_iter())+"_.obj").c_str());
+		}
+		if (save_mesh_flag){
+			tlog::info() << "SAVING";
+			Eigen::Vector3i resMesh(512, 512, 512);
+			if (resolution_flag){
+				resMesh[0] = get(resolution_flag);
+				resMesh[1] = get(resolution_flag);
+				resMesh[2] = get(resolution_flag);
+			}
+			testbed.compute_and_save_marching_cubes_mesh(obj_filename_buf,resMesh,{},0.0f,false);
+		}
+
+
 	} catch (const exception& e) {
 		tlog::error() << "Uncaught exception: " << e.what();
 		return 1;
 	}
+
 }

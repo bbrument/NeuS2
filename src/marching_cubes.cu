@@ -830,6 +830,8 @@ void save_mesh(
 	bool unwrap_it,
 	float nerf_scale,
 	Vector3f nerf_offset,
+	float n2w_s,
+	Vector3f n2w_t,
 	bool invert_normals
 ) {
 	std::vector<Vector3f> cpuverts; cpuverts.resize(verts.size());
@@ -859,6 +861,7 @@ void save_mesh(
 				// | . .\x x\. |
 				// 2 - - 1 x x 5
 				uint32_t xi = x % quadresx, yi = y % quadresy;
+				
 				uint32_t t = q*2 + (xi>yi+1);
 				int r = (t*923)&255;
 				int g = (t*3572)&255;
@@ -879,6 +882,7 @@ void save_mesh(
 		throw std::runtime_error{"Failed to open " + std::string(outputname) + " for writing."};
 	}
 
+	printf("%f , [%f %f %f]\n",n2w_s,n2w_t.x(),n2w_t.y(),n2w_t.z());
 	if (fs::path(outputname).extension() == "ply") {
 		// ply file
 		fprintf(f,
@@ -903,6 +907,7 @@ void save_mesh(
 		);
 		for (size_t i=0;i<cpuverts.size();++i) {
 			Vector3f p=(cpuverts[i]-nerf_offset)/nerf_scale;
+			p = n2w_s*p + n2w_t;
 			Vector3f c=cpucolors[i];
 			Vector3f n=cpunormals[i].normalized();
 			unsigned char c8[3]={(unsigned char)tcnn::clamp(c.x()*255.f,0.f,255.f),(unsigned char)tcnn::clamp(c.y()*255.f,0.f,255.f),(unsigned char)tcnn::clamp(c.z()*255.f,0.f,255.f)};
@@ -921,6 +926,7 @@ void save_mesh(
 		}
 		for (size_t i = 0; i < cpuverts.size(); ++i) {
 			Vector3f p = (cpuverts[i]-nerf_offset)/nerf_scale;
+			p = n2w_s*p + n2w_t;
 			Vector3f c = cpucolors[i];
 			fprintf(f,"v %0.5f %0.5f %0.5f %0.3f %0.3f %0.3f\n", p.x(), p.y(), p.z(), tcnn::clamp(c.x(), 0.f, 1.f), tcnn::clamp(c.y(), 0.f, 1.f), tcnn::clamp(c.z(), 0.f, 1.f));
 		}

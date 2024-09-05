@@ -48,6 +48,8 @@ void save_mesh(
 	bool unwrap_it,
 	float nerf_scale,
 	Eigen::Vector3f nerf_offset,
+	float n2w_s,
+	Eigen::Vector3f n2w_t,
 	bool invert_normals=false
 );
 

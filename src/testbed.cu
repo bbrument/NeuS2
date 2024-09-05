@@ -251,6 +251,14 @@ void Testbed::set_view_dir(const Vector3f& dir) {
 	set_look_at(old_look_at);
 }
 
+void Testbed::set_max_iter(uint32_t max_it) {
+    m_max_iter = max_it;
+}
+
+uint32_t Testbed::get_max_iter() {
+    return m_max_iter;
+}
+
 void Testbed::set_camera_to_training_view(int trainview) {
 	auto old_look_at = look_at();
 	m_camera = m_smoothed_camera = get_xform_given_rolling_shutter(m_nerf.training.transforms[trainview], m_nerf.training.dataset.metadata[trainview].rolling_shutter, Vector2f{0.5f, 0.5f}, 0.0f);
@@ -302,7 +310,10 @@ void Testbed::compute_and_save_marching_cubes_mesh(const char* filename, Vector3
 	printf("unwrap_it:%d\n",unwrap_it);
 	marching_cubes(res3d, aabb, thresh);
 	if ((m_testbed_mode == ETestbedMode::Nerf)){
-		save_mesh(m_mesh.verts, m_mesh.vert_normals, m_mesh.vert_colors, m_mesh.indices, filename, unwrap_it, m_nerf.training.dataset.scale, m_nerf.training.dataset.offset, m_nerf.training.dataset.from_na);
+		save_mesh(m_mesh.verts, m_mesh.vert_normals, m_mesh.vert_colors, m_mesh.indices, filename, unwrap_it, 
+		m_nerf.training.dataset.scale, m_nerf.training.dataset.offset, 
+		m_nerf.training.dataset.n2w_s, m_nerf.training.dataset.n2w_t,
+		m_nerf.training.dataset.from_na);
 	}
 }
 
@@ -920,7 +931,10 @@ void Testbed::imgui() {
 			if (uint32_t tricount = m_mesh.indices.size()/3) {
 				ImGui::InputText("##OBJFile", obj_filename_buf, sizeof(obj_filename_buf));
 				if (ImGui::Button("Save it!")) {
-					save_mesh(m_mesh.verts, m_mesh.vert_normals, m_mesh.vert_colors, m_mesh.indices, obj_filename_buf, m_mesh.unwrap, m_nerf.training.dataset.scale, m_nerf.training.dataset.offset, m_nerf.training.dataset.from_na);
+					save_mesh(m_mesh.verts, m_mesh.vert_normals, m_mesh.vert_colors, m_mesh.indices, obj_filename_buf, 
+						m_mesh.unwrap, m_nerf.training.dataset.scale, m_nerf.training.dataset.offset, 
+						m_nerf.training.dataset.n2w_s, m_nerf.training.dataset.n2w_t,
+						m_nerf.training.dataset.from_na);
 				}
 				ImGui::SameLine();
 				ImGui::Text("Mesh has %d triangles\n", tricount);
@@ -1769,7 +1783,12 @@ bool Testbed::frame() {
 	}
 #endif
 
-	return true;
+	if (m_training_step >= m_max_iter){
+        return false;
+    }
+    else{
+        return true;
+    }
 }
 
 fs::path Testbed::training_data_path() const {

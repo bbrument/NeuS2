@@ -79,6 +79,8 @@ struct NerfDataset {
 	BoundingBox render_aabb = {};
 	Eigen::Vector3f up = {0.0f, 1.0f, 0.0f};
 	Eigen::Vector3f offset = {0.0f, 0.0f, 0.0f};
+	float n2w_s = 1;
+	Eigen::Vector3f n2w_t = {0.0f, 0.0f, 0.0f};
 	size_t n_images = 0;
 	Eigen::Vector2i envmap_resolution = {0, 0};
 	float scale = 1.0f;

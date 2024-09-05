@@ -680,7 +680,7 @@ NerfDataset load_nerf(const std::vector<filesystem::path>& jsonpaths, float shar
 				if (frame.contains("intrinsic_matrix")){
 					const auto& intrinsic = frame["intrinsic_matrix"];
 					result.metadata[i_img].focal_length.x() = float(intrinsic[0][0]);
-					 result.metadata[i_img].focal_length.y() = float(intrinsic[1][1]);
+					result.metadata[i_img].focal_length.y() = float(intrinsic[1][1]);
 					result.metadata[i_img].principal_point.x() = float(intrinsic[0][2])/(float)json["w"];
 					result.metadata[i_img].principal_point.y() = float(intrinsic[1][2])/(float)json["h"];
 				}
@@ -713,6 +713,13 @@ NerfDataset load_nerf(const std::vector<filesystem::path>& jsonpaths, float shar
 
 			progress.update(++n_loaded);
 		}, futures);
+
+		if (json.contains("n2w")) {
+			for (int m = 0; m < 3; ++m) {
+				result.n2w_t(m) = float(json["n2w"][m][3]);
+			}
+			result.n2w_s = float(json["n2w"][0][0]);
+		}
 
 		if (json.contains("frames")) {
 			image_idx += json["frames"].size();

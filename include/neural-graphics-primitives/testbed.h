@@ -315,6 +315,8 @@ public:
 	Eigen::Vector3f view_up() const { return m_camera.col(1); }
 	Eigen::Vector3f view_side() const { return m_camera.col(0); }
 	void set_view_dir(const Eigen::Vector3f& dir);
+	void set_max_iter(uint32_t max_it);
+	uint32_t get_max_iter();
 	void set_camera_to_training_view(int trainview);
 	void reset_camera();
 	bool keyboard_event();
@@ -484,6 +486,7 @@ public:
 	int m_fixed_res_factor = 8;
 	float m_last_render_res_factor = 1.0f;
 	float m_scale = 1.0;
+	uint32_t m_max_iter = 15000;
 	float m_prev_scale = 1.0;
 	float m_dof = 0.0f;
 	Eigen::Vector2f m_relative_focal_length = Eigen::Vector2f::Ones();
