@@ -268,11 +268,11 @@ int main(int argc, char** argv) {
 			}
 		}
 
-		// Save snapshot
-		std::string path = get(scene_flag);
-		size_t found = path.find_last_of("/\\");
-		std::string folder_name = path.substr(0,found);
-		std::string  snapshot_filename = folder_name +"/snapshot_"+to_string(testbed.get_max_iter())+".msgpack";
+		// Save snapshot and in data/lame/neus2_from_metashape
+		std::string path = get(scene_flag); // data/lame/neus2_from_metashape/transforms.json or data/lame/neus2_from_metashape
+		std::string::size_type pos = path.find_last_of("/");
+		path = path.substr(0,pos); // data/lame/neus2_from_metashape
+		std::string  snapshot_filename = path +"/snapshot_"+to_string(testbed.get_max_iter())+".msgpack";
 		if(save_snapshot_flag){
 			tlog::info() << "Saving Snapshot !";
 			tlog::info() << snapshot_filename;
@@ -282,7 +282,7 @@ int main(int argc, char** argv) {
 		// Save mesh
 		static char obj_filename_buf[128] = "";
 		if (obj_filename_buf[0] == '\0') {
-			snprintf(obj_filename_buf, sizeof(obj_filename_buf), "%s", (folder_name+"/mesh_"+to_string(testbed.get_max_iter())+"_.obj").c_str());
+			snprintf(obj_filename_buf, sizeof(obj_filename_buf), "%s", (path+"/mesh_"+to_string(testbed.get_max_iter())+"_.obj").c_str());
 		}
 		if (save_mesh_flag){
 			tlog::info() << "SAVING";
