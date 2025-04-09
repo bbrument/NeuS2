@@ -62,6 +62,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # CUDA compiler setup
 ###############################################################################
 
+# Update CMakeLists.txt to only include relevant architectures
+set(CUDA_ARCHITECTURES "75;80;86")
+
 set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_EXTENSIONS OFF)

@@ -85,13 +85,13 @@ def generate(dataset_name, base_par_dir, copy_image=True, is_downsample=False, d
 
     conf = {
         "data_dir": base_dir,
-        "render_cameras_name": "cameras_sphere.npz",
-        "object_cameras_name": "cameras_sphere.npz",
+        "render_cameras_name": "cameras.npz",
+        "object_cameras_name": "cameras.npz",
     }
     dataset = Dataset(conf)
     image_name = 'image'
     mask_name = 'mask'
-    test_view = [8, 13, 16, 21, 26, 31, 34, 56]
+    test_view = [8, 13, 16, 21, 26, 31, 34, 52]
 
     os.makedirs(output_dir, exist_ok=True)
 

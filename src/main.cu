@@ -263,8 +263,10 @@ int main(int argc, char** argv) {
 		// Render/training loop
 		while (testbed.frame()) {
 			if (!gui) {
-				tlog::info() << "iteration=" << testbed.m_training_step << " loss=" << testbed.m_loss_scalar.val();
-				// tlog::info() << "iteration=" << testbed.m_training_step << " loss=" << testbed.m_loss_scalar.val() << " lr=" << testbed.m_optimizer.learning_rate();
+				if (testbed.m_training_step % 100 == 0){
+                    tlog::info() << "iteration=" << testbed.m_training_step << " loss=" << testbed.m_loss_scalar.val();
+                // tlog::info() << "iteration=" << testbed.m_training_step << " loss=" << testbed.m_loss_scalar.val() << " lr=" << testbed.m_optimizer.learning_rate();
+				}
 			}
 		}
 
